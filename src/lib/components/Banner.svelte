@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { run, stopPropagation } from 'svelte/legacy'
+
 	import X from 'lucide-svelte/icons/x'
 	import { page } from '$app/stores'
 	import { fade } from 'svelte/transition'
@@ -6,12 +8,17 @@
 	import { setItem } from '$lib/localStorage'
 	import LinkWithoutIcon from '$lib/components/LinkWithoutIcon.svelte'
 
-	export let type: 'main' | 'campaign' = 'main'
-	export let id: string | null = null
-	export let href: string | null = null
-	export let contrast = false
+	interface Props {
+		type?: 'main' | 'campaign'
+		id?: string | null
+		href?: string | null
+		contrast?: boolean
+		children?: import('svelte').Snippet
+	}
 
-	let dismissed = false
+	let { type = 'main', id = null, href = null, contrast = false, children }: Props = $props()
+
+	let dismissed = $state(false)
 
 	function close() {
 		dismissed = true
@@ -22,12 +29,14 @@
 	}
 
 	// Hide on navigation to the target/href page
-	$: if (href && deLocalizeHref($page.url.pathname) === href) {
-		dismissed = true
-	}
+	run(() => {
+		if (href && deLocalizeHref($page.url.pathname) === href) {
+			dismissed = true
+		}
+	})
 
-	$: isCampaign = type === 'campaign'
-	$: dataIdAttr = isCampaign ? 'data-campaign-banner-id' : 'data-banner-id'
+	let isCampaign = $derived(type === 'campaign')
+	let dataIdAttr = $derived(isCampaign ? 'data-campaign-banner-id' : 'data-banner-id')
 </script>
 
 <svelte:head>
@@ -57,19 +66,19 @@
 			{#if isCampaign && href}
 				<LinkWithoutIcon {href} class="campaign-link" on:click={close}>
 					<span class="campaign-text">
-						<slot></slot>
+						{@render children?.()}
 					</span>
 					<span class="campaign-cta">Take action →</span>
 				</LinkWithoutIcon>
 			{:else}
-				<slot></slot>
+				{@render children?.()}
 			{/if}
 		</span>
 
 		<button
 			class="close banner-close-btn"
 			class:campaign-close={isCampaign}
-			on:click|stopPropagation={close}
+			onclick={stopPropagation(close)}
 		>
 			<X size={isCampaign ? '1em' : '1.2em'} />
 			<span class="sr-only">Close</span>

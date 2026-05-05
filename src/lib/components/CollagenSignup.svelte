@@ -8,11 +8,19 @@
 
 	const campaign = 'sayno'
 
-	export let userHasUid = false
-	export let subscribeEmail = ''
-	export let newsletterEmail = ''
-	let submitted = false
-	let hideSharing = false
+	interface Props {
+		userHasUid?: boolean
+		subscribeEmail?: string
+		newsletterEmail?: string
+	}
+
+	let {
+		userHasUid = $bindable(false),
+		subscribeEmail = $bindable(''),
+		newsletterEmail = $bindable('')
+	}: Props = $props()
+	let submitted = $state(false)
+	let hideSharing = $state(false)
 
 	onMount(() => {
 		userHasUid = detectAndStoreCollagenUid(campaign, $page.url.searchParams)
@@ -33,7 +41,7 @@
 		{/if}
 	</Banner>
 
-	<div on:submit={() => (submitted = true)}>
+	<div onsubmit={() => (submitted = true)}>
 		<NewsletterSignup bind:email={newsletterEmail} />
 	</div>
 

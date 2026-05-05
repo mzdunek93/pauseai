@@ -13,7 +13,7 @@
 		source: string
 		isGrounding?: boolean
 	}
-	let doomers: Doomer[] = [
+	let doomers: Doomer[] = $state([
 		{
 			name: 'Yann LeCun',
 			title: 'one of three godfathers of AI, works at Meta',
@@ -246,7 +246,7 @@
 			source: 'https://www.theguardian.com/science/2011/aug/17/shark-attacks-rare-deaths-rarer',
 			isGrounding: true
 		}
-	]
+	])
 	doomers = doomers.sort((a, b) => b.number - a.number)
 </script>
 

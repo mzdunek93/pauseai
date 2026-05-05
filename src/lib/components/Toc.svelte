@@ -6,11 +6,11 @@
 	import Backdrop from '$lib/components/Backdrop.svelte'
 	import { onMount } from 'svelte'
 
-	let desktop: boolean | undefined
-	let open: boolean | undefined
-	let headings: HTMLHeadingElement[] | undefined
+	let desktop: boolean | undefined = $state()
+	let open: boolean | undefined = $state()
+	let headings: HTMLHeadingElement[] | undefined = $state()
 	const maxTop = 14
-	let sidebarTop = maxTop // Initial top offset in rem (below banner)
+	let sidebarTop = $state(maxTop) // Initial top offset in rem (below banner)
 
 	// Track scroll to adjust sidebar position
 	onMount(() => {
@@ -78,6 +78,7 @@
 			open={true}
 			desktop={true}
 		>
+			<!-- @migration-task: migrate this slot by hand, `title` would shadow a prop on the parent component -->
 			<svelte:fragment slot="title">
 				<h2 class="toc-title-heading toc-exclude">Contents</h2>
 			</svelte:fragment>
@@ -101,15 +102,17 @@
 			bind:headings
 			hide={(headings?.length ?? 0) <= 1}
 		>
+			<!-- @migration-task: migrate this slot by hand, `open-toc-icon` is an invalid identifier -->
 			<svelte:fragment slot="open-toc-icon">
 				<List size="2rem" />
 			</svelte:fragment>
+			<!-- @migration-task: migrate this slot by hand, `title` would shadow a prop on the parent component -->
 			<svelte:fragment slot="title">
 				<div class="toc-head">
 					<h2 class="toc-title-heading toc-exclude">Contents</h2>
 					<button
 						class="toc-close"
-						on:click={() => (open = false)}
+						onclick={() => (open = false)}
 						aria-label="Close table of contents"
 					>
 						<X size="1.2rem" />

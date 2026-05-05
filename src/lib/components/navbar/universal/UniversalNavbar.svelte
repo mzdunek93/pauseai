@@ -6,11 +6,16 @@
 	import { localizeHref } from '$lib/paraglide/runtime'
 	import { onMount } from 'svelte'
 
-	export let inverted = false
+	interface Props {
+		inverted?: boolean
+		children?: import('svelte').Snippet
+	}
 
-	$: logo_animate = localizeHref($page.url.pathname) != '/'
+	let { inverted = false, children }: Props = $props()
 
-	let nav: HTMLElement
+	let logo_animate = $derived(localizeHref($page.url.pathname) != '/')
+
+	let nav: HTMLElement = $state()
 
 	onMount(() => {
 		return emulateCqwIfNeeded(nav)
@@ -29,7 +34,7 @@
 	</div>
 
 	<div class="nav-links">
-		<slot></slot>
+		{@render children?.()}
 	</div>
 </nav>
 

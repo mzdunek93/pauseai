@@ -1,16 +1,19 @@
 <!-- FILEPATH: /Users/joep/dev/github/joepio/pauseai/src/routes/chat/+page.svelte -->
 <script lang="ts">
+	import { preventDefault } from 'svelte/legacy'
+
 	import { botName } from '$lib/config'
 	import type { ChatRequest, ChatResponse, Message } from '$api/chat/+server'
 	import { onMount } from 'svelte'
 
-	let messages: Message[] =
+	let messages: Message[] = $state(
 		typeof localStorage !== 'undefined'
 			? (JSON.parse(localStorage.getItem('messages') || '[]') as Message[])
 			: []
+	)
 
-	let input = ''
-	let loading = false
+	let input = $state('')
+	let loading = $state(false)
 	const maxMessages = 20
 
 	function clear() {
@@ -94,14 +97,14 @@
 <footer>
 	{#if messages.length > maxMessages}
 		<p>You reached the maximum amount of messages, you can clear the chat</p>
-		<button class="button" on:click={clear}>Clear chat</button>
-		<button class="button" on:click={copy}>Copy chat</button>
+		<button class="button" onclick={clear}>Clear chat</button>
+		<button class="button" onclick={copy}>Copy chat</button>
 	{:else}
-		<form on:submit|preventDefault={sendMessage}>
-			<textarea placeholder="Type here" bind:value={input} on:keydown={handleKeyDown}></textarea>
+		<form onsubmit={preventDefault(sendMessage)}>
+			<textarea placeholder="Type here" bind:value={input} onkeydown={handleKeyDown}></textarea>
 			<div class="buttons">
-				<button on:click={clear} class="button button--alt">Clear chat</button>
-				<button on:click={copy} class="button button--alt">Copy chat</button>
+				<button onclick={clear} class="button button--alt">Clear chat</button>
+				<button onclick={copy} class="button button--alt">Copy chat</button>
 				<button type="submit" disabled={loading || input == ''}> Send </button>
 			</div>
 		</form>

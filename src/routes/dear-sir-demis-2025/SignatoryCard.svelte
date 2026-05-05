@@ -1,7 +1,11 @@
 <script lang="ts">
 	import type { Signatory } from './types'
 
-	export let signatory: Signatory
+	interface Props {
+		signatory: Signatory
+	}
+
+	let { signatory }: Props = $props()
 
 	// Determine the portrait path based on chamber and processed images
 	function getPortraitPath(signatory: { portrait?: string }) {

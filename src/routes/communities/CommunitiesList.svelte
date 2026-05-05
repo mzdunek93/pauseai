@@ -16,9 +16,13 @@
 	import type { NationalGroup } from '$lib/types'
 	import { SvelteSet } from 'svelte/reactivity'
 
-	export let communities: Community[] = []
+	interface Props {
+		communities?: Community[]
+	}
 
-	let nationalGroups: NationalGroup[] = []
+	let { communities = [] }: Props = $props()
+
+	let nationalGroups: NationalGroup[] = $state([])
 
 	onMount(async () => {
 		nationalGroups = await fetchNationalGroups()
@@ -62,7 +66,7 @@
 	)
 
 	// Start with all countries collapsed by default
-	let expandedCountries: Set<string> = new Set()
+	let expandedCountries: Set<string> = $state(new Set())
 
 	function toggleCountry(country: string) {
 		const newSet = new SvelteSet(expandedCountries)
@@ -90,7 +94,7 @@
 					class:expanded={expandedCountries.has(nationality)}
 					class:has-communities={localCommunities.length > 0}
 					disabled={localCommunities.length === 0}
-					on:click={() => toggleCountry(nationality)}
+					onclick={() => toggleCountry(nationality)}
 				>
 					<div class="icon" class:is-open={expandedCountries.has(nationality)}>
 						{#if localCommunities.length > 0}

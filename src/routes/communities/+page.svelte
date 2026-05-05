@@ -21,7 +21,7 @@
 	let { title, description, date } = communitiesMeta
 
 	let map: maplibregl.Map
-	let mapContainer: HTMLDivElement
+	let mapContainer: HTMLDivElement = $state()
 	let lng: number
 	let lat: number
 	let zoom: number

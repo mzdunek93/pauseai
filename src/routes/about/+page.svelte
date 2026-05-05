@@ -5,7 +5,7 @@
 	import type { Person } from '$lib/types'
 	import Link from '$lib/components/Link.svelte'
 
-	export let data
+	let { data } = $props()
 
 	const peopleGroups = data.people as Record<string, Person[]>
 

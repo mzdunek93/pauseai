@@ -14,7 +14,11 @@
 	import { onMount } from 'svelte'
 	import Card from '$lib/components/Card.svelte'
 
-	export let inverted = false
+	interface Props {
+		inverted?: boolean
+	}
+
+	let { inverted = false }: Props = $props()
 
 	// Check if we should show the language switcher (only show when multiple locales)
 	const showSwitcher = locales.length > 1
@@ -24,9 +28,9 @@
 	// Keep a map of locale-specific display names
 	const nativeLanguageNames: Record<string, Intl.DisplayNames> = {}
 
-	let open = false
-	let button: HTMLButtonElement
-	let dropdown: HTMLDivElement
+	let open = $state(false)
+	let button: HTMLButtonElement = $state()
+	let dropdown: HTMLDivElement = $state()
 
 	// Get native name for a language
 	function getNativeLanguageName(locale: string): string {
@@ -151,7 +155,7 @@
 		<button
 			class="button reset-button"
 			bind:this={button}
-			on:click={(e) => {
+			onclick={(e) => {
 				e.preventDefault()
 				open = !open
 			}}
@@ -168,7 +172,7 @@
 				<a
 					href={deLocalizeHref($page.url.pathname)}
 					hreflang="auto"
-					on:click={handleLanguageClick}
+					onclick={handleLanguageClick}
 					class="auto-detect"
 				>
 					<span class="auto-icon">🌐</span> <span class="auto-text">AUTO</span>
@@ -183,7 +187,7 @@
 						{href}
 						hreflang={locale}
 						aria-current={locale === getLocale() ? 'page' : undefined}
-						on:click={handleLanguageClick}
+						onclick={handleLanguageClick}
 					>
 						{getDualLanguageName(locale)}
 					</a>

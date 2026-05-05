@@ -1,7 +1,11 @@
 <script lang="ts">
 	import type { Quote } from './types'
 
-	export let quote: Quote
+	interface Props {
+		quote: Quote
+	}
+
+	let { quote }: Props = $props()
 
 	const displayName = quote.displayName || quote.name
 </script>

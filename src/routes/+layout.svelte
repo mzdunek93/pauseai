@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy'
+
 	import type { GeoApiResponse } from '$api/geo/+server'
 	import { browser } from '$app/environment'
 	import { page } from '$app/stores'
@@ -31,11 +33,16 @@
 	import hydrationAwareClick from './hydration-aware-click.js?raw'
 	import type { PageData } from './$types'
 
-	export let data: PageData
+	interface Props {
+		data: PageData
+		children?: import('svelte').Snippet
+	}
 
-	let eventFound: boolean
-	let geoForNearbyEvent: GeoApiResponse | null = null
-	$: hero = deLocalizeHref($page.url.pathname) === '/'
+	let { data, children }: Props = $props()
+
+	let eventFound: boolean = $state()
+	let geoForNearbyEvent: GeoApiResponse | null = $state(null)
+	let hero = $derived(deLocalizeHref($page.url.pathname) === '/')
 
 	onMount(async () => {
 		document.documentElement.removeAttribute('data-waiting')
@@ -72,9 +79,11 @@
 	})
 
 	// NearbyEvent overrides the main banner
-	$: if (browser && eventFound) {
-		delete document.documentElement.dataset.activeBanner
-	}
+	run(() => {
+		if (browser && eventFound) {
+			delete document.documentElement.dataset.activeBanner
+		}
+	})
 
 	function sanitizeScript(code: string) {
 		return code
@@ -179,7 +188,7 @@
 	{#if $page.route.id === '/sayno'}
 		<!-- Dynamic import and render the selfie UX component -->
 		{#await import('./sayno/SelfieUX.svelte') then module}
-			<svelte:component this={module.default} />
+			<module.default />
 		{/await}
 	{/if}
 
@@ -189,7 +198,7 @@
 
 	<main>
 		<PageTransition url={$page.url.pathname}>
-			<slot></slot>
+			{@render children?.()}
 		</PageTransition>
 	</main>
 

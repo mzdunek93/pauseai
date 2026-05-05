@@ -1,7 +1,12 @@
 <script lang="ts">
+	import Node from './Node.svelte'
 	import Link from '../Link.svelte'
 
-	export let headings: Element[]
+	interface Props {
+		headings: Element[]
+	}
+
+	let { headings }: Props = $props()
 
 	let level = extractLevel(headings[0])
 
@@ -26,7 +31,7 @@
 			{@const previousLevel = extractLevel(headings[i - 1])}
 			{#if currentLevel > level && previousLevel == level}
 				{@const sliced = headings.slice(i)}
-				<svelte:self headings={sliced} />
+				<Node headings={sliced} />
 			{/if}
 		{/if}
 		{#if currentLevel == level}

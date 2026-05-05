@@ -6,7 +6,11 @@
 	import GithubSlugger from 'github-slugger'
 	import type { PageData } from './$types'
 
-	export let data: PageData
+	interface Props {
+		data: PageData
+	}
+
+	let { data }: Props = $props()
 
 	const { quotes } = data
 </script>

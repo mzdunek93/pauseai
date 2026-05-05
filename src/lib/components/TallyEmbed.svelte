@@ -1,39 +1,51 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy'
+
 	import { onMount } from 'svelte'
 	import { SvelteURLSearchParams } from 'svelte/reactivity'
 
 	// ─── REQUIRED ────────────────────────────────────────────────────────
 
-	/** Tally form ID (required) */
-	export let formId: string
-
 	// ─── OPTIONAL ────────────────────────────────────────────────────────
 
-	/** Optional custom domain (Pro feature) */
-	export let customDomain = ''
+	interface Props {
+		/** Tally form ID (required) */
+		formId: string
+		/** Optional custom domain (Pro feature) */
+		customDomain?: string
+		// Toggle UI features
+		alignLeft?: boolean
+		hideTitle?: boolean
+		transparentBackground?: boolean
+		dynamicHeight?: boolean
+		/** Additional hidden query parameters */
+		extraParams?: Record<string, string | number | boolean>
+		/** Initial iframe height in pixels */
+		height?: number
+	}
 
-	// Toggle UI features
-
-	export let alignLeft = true
-	export let hideTitle = true
-	export let transparentBackground = true
-	export let dynamicHeight = true
-
-	/** Additional hidden query parameters */
-	export let extraParams: Record<string, string | number | boolean> = {}
-
-	/** Initial iframe height in pixels */
-	export let height = 282
+	let {
+		formId,
+		customDomain = '',
+		alignLeft = true,
+		hideTitle = true,
+		transparentBackground = true,
+		dynamicHeight = true,
+		extraParams = {},
+		height = 282
+	}: Props = $props()
 
 	// ─── EMBED URL CONSTRUCTION ─────────────────────────────────────────
 
-	$: baseUrl = customDomain
-		? `${customDomain.replace(/\/+$/, '')}/${formId}`
-		: `https://tally.so/embed/${formId}`
+	let baseUrl = $derived(
+		customDomain
+			? `${customDomain.replace(/\/+$/, '')}/${formId}`
+			: `https://tally.so/embed/${formId}`
+	)
 
-	let urlParams = new SvelteURLSearchParams()
+	let urlParams = $state(new SvelteURLSearchParams())
 
-	$: {
+	run(() => {
 		urlParams = new SvelteURLSearchParams()
 
 		if (alignLeft) urlParams.set('alignLeft', '1')
@@ -46,9 +58,9 @@
 				urlParams.set(key, value.toString())
 			}
 		}
-	}
+	})
 
-	$: formSrc = `${baseUrl}?${urlParams.toString()}`
+	let formSrc = $derived(`${baseUrl}?${urlParams.toString()}`)
 
 	// execute after DOM is ready
 	onMount(() => {

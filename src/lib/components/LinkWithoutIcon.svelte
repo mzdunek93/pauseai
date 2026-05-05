@@ -1,17 +1,31 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy'
+
 	import { page } from '$app/stores'
 	import { pushState } from '$app/navigation'
 	import { localizeHref, locales } from '$lib/paraglide/runtime'
 	import type { LinkType } from '$lib/types'
 	import type { Action } from 'svelte/action'
 
-	export let href: string | null = null
-	export let target: string | null = null
-	let className: string = ''
-	export { className as class }
-	export let rel: string | null = null
+	interface Props {
+		href?: string | null
+		target?: string | null
+		class?: string
+		rel?: string | null
+		type?: LinkType
+		children?: import('svelte').Snippet
+		[key: string]: any
+	}
 
-	export let type: LinkType = 'internal'
+	let {
+		href = null,
+		target = $bindable(null),
+		class: className = '',
+		rel = $bindable(null),
+		type = $bindable('internal'),
+		children,
+		...rest
+	}: Props = $props()
 
 	// Localization helpers
 	const localePattern = new RegExp(`^/(${locales.join('|')})(/|$)`)
@@ -27,8 +41,8 @@
 	}
 
 	// Normalize and localize href
-	let resolvedHref: string | null = null
-	$: {
+	let resolvedHref: string | null = $state(null)
+	run(() => {
 		if (href) {
 			if (
 				(href.startsWith('http:') || href.startsWith('https:')) &&
@@ -47,7 +61,7 @@
 
 			resolvedHref = processHref(href)
 		}
-	}
+	})
 
 	/** Action for smooth scrolling to anchor links */
 	const smoothScroll: Action<HTMLAnchorElement, string | null> = (
@@ -81,13 +95,6 @@
 </script>
 
 <!-- eslint-disable-next-line svelte/no-restricted-html-elements - Warning is about using this component -->
-<a
-	href={resolvedHref}
-	{target}
-	{rel}
-	class={className}
-	use:smoothScroll={resolvedHref}
-	{...$$restProps}
->
-	<slot></slot>
+<a href={resolvedHref} {target} {rel} class={className} use:smoothScroll={resolvedHref} {...rest}>
+	{@render children?.()}
 </a>

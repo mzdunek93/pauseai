@@ -1,4 +1,5 @@
 <script lang="ts">
+	import TreeNode from './TreeNode.svelte'
 	import Slider from './Slider.svelte'
 	import Propability from './Propability.svelte'
 	import type { TreeNodeType } from './tree'
@@ -6,16 +7,26 @@
 	import Button from '$lib/components/Button.svelte'
 	import { fade } from 'svelte/transition'
 
-	export let node: TreeNodeType
-	export let parentProbability = 1
-	export let showProbabilities = false
-	export let top: HTMLElement
-	export let intro: boolean
-	let probability: number = node.probability
-	let showInfo = false
-	let selected: 'yes' | 'no' | undefined
-	$: selectedNode = selected == 'yes' ? node.yes : node.no
-	$: selectedProbability = selected == 'yes' ? probability : 1 - probability
+	interface Props {
+		node: TreeNodeType
+		parentProbability?: number
+		showProbabilities?: boolean
+		top: HTMLElement
+		intro: boolean
+	}
+
+	let {
+		node,
+		parentProbability = 1,
+		showProbabilities = $bindable(false),
+		top = $bindable(),
+		intro = $bindable()
+	}: Props = $props()
+	let probability: number = $state(node.probability)
+	let showInfo = $state(false)
+	let selected: 'yes' | 'no' | undefined = $state()
+	let selectedNode = $derived(selected == 'yes' ? node.yes : node.no)
+	let selectedProbability = $derived(selected == 'yes' ? probability : 1 - probability)
 
 	const scrollToTop = () => {
 		setTimeout(() => {
@@ -23,7 +34,7 @@
 		}, 10)
 	}
 
-	let child: HTMLElement
+	let child: HTMLElement = $state()
 	const scrollToNextChild = () => {
 		setTimeout(() => {
 			if (child) {
@@ -83,7 +94,7 @@
 		{#key selectedNode.text}
 			<div class="child" in:fade={{ duration: 200 }} bind:this={child}>
 				{#if selectedNode.type == 'question'}
-					<svelte:self
+					<TreeNode
 						node={selectedNode}
 						parentProbability={parentProbability * selectedProbability}
 						bind:showProbabilities

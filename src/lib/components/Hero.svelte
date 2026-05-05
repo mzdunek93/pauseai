@@ -6,7 +6,7 @@
 
 	import Link from '$lib/components/Link.svelte'
 
-	let tagline: HTMLDivElement
+	let tagline: HTMLDivElement = $state()
 
 	onMount(() => {
 		const cleanupCqwEmulation = emulateCqwIfNeeded(tagline)

@@ -4,15 +4,26 @@
 	import { page } from '$app/stores'
 	import { deLocalizeHref } from '$lib/paraglide/runtime'
 
-	export let title: string
-	export let description: string
-	export let date: string | undefined = undefined
-	/** URL or relative path to cover / preview image */
-	export let image = '/Cover.jpg'
-	/** Canonical URL for this page (og:url) */
-	export let pageUrl: string = `${rootUrl}${deLocalizeHref($page.url.pathname)}`
-	/** Alt text for the image (og:image:alt) */
-	export let imageAlt: string | undefined = undefined
+	interface Props {
+		title: string
+		description: string
+		date?: string | undefined
+		/** URL or relative path to cover / preview image */
+		image?: string
+		/** Canonical URL for this page (og:url) */
+		pageUrl?: string
+		/** Alt text for the image (og:image:alt) */
+		imageAlt?: string | undefined
+	}
+
+	let {
+		title,
+		description,
+		date = undefined,
+		image = '/Cover.jpg',
+		pageUrl = `${rootUrl}${deLocalizeHref($page.url.pathname)}`,
+		imageAlt = undefined
+	}: Props = $props()
 
 	const imageUrl = image.startsWith('/') ? `${rootUrl}${image}` : image
 

@@ -4,8 +4,8 @@
 	import * as m from '$lib/paraglide/messages.js'
 	import Node from './Node.svelte'
 
-	let heading: HTMLHeadingElement
-	let headingsBelow: Element[] | undefined
+	let heading: HTMLHeadingElement = $state()
+	let headingsBelow: Element[] | undefined = $state()
 
 	onMount(() => {
 		const parent = heading.parentElement

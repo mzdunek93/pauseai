@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy'
+
 	import Image from '$lib/components/Image.svelte'
 	import LinkWithoutIcon from '$lib/components/LinkWithoutIcon.svelte'
 	import type { NewsItem } from '$lib/types'
@@ -6,19 +8,28 @@
 	import NetlifyImage from './NetlifyImage.svelte'
 	import Skeleton from './Skeleton.svelte'
 
-	let isExternal: boolean
-	let hasImageError = false
+	let isExternal: boolean = $derived(item?.source === 'substack' || item?.source === 'press')
+	let hasImageError = $state(false)
 
-	export let item: NewsItem | undefined = undefined
-	export let loading: boolean = false
-	export let imageSizes: string | undefined = undefined
-	/** Optional anchor id (e.g. for hash links from elsewhere) */
-	export let id: string | undefined = undefined
+	interface Props {
+		item?: NewsItem | undefined
+		loading?: boolean
+		imageSizes?: string | undefined
+		/** Optional anchor id (e.g. for hash links from elsewhere) */
+		id?: string | undefined
+	}
 
-	$: isExternal = item?.source === 'substack' || item?.source === 'press'
+	let {
+		item = undefined,
+		loading = false,
+		imageSizes = undefined,
+		id = undefined
+	}: Props = $props()
 
 	// Reset error state if image changes
-	$: if (item?.image) hasImageError = false
+	run(() => {
+		if (item?.image) hasImageError = false
+	})
 </script>
 
 <div>

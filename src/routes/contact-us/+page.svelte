@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy'
+
 	import { browser } from '$app/environment'
 	import { enhance } from '$app/forms'
 	import { toast } from 'svelte-french-toast'
@@ -11,11 +13,11 @@
 
 	const { title, description } = meta
 
-	let activeTab: 'media' | 'partnerships' | 'feedback' = 'partnerships'
-	let loading = false
-	let honeypot = ''
+	let activeTab: 'media' | 'partnerships' | 'feedback' = $state('partnerships')
+	let loading = $state(false)
+	let honeypot = $state('')
 
-	let formData = {
+	let formData = $state({
 		media: { name: '', email: '', subject: '', organization: '', details: '' },
 		partnerships: {
 			name: '',
@@ -27,7 +29,7 @@
 			message: ''
 		},
 		feedback: { name: '', email: '', subject: '', message: '' }
-	}
+	})
 
 	type ContactFormState = typeof formData
 
@@ -106,9 +108,11 @@
 		}
 	})
 
-	$: if (browser && formData) {
-		localStorage.setItem('contactFormData', JSON.stringify(formData))
-	}
+	run(() => {
+		if (browser && formData) {
+			localStorage.setItem('contactFormData', JSON.stringify(formData))
+		}
+	})
 
 	function handleEnhance({ cancel }: { cancel: () => void }) {
 		if (activeTab === 'partnerships') {
@@ -172,21 +176,21 @@
 		<button
 			class="tab-button"
 			class:active={activeTab === 'partnerships'}
-			on:click={() => (activeTab = 'partnerships')}
+			onclick={() => (activeTab = 'partnerships')}
 		>
 			Partnerships
 		</button>
 		<button
 			class="tab-button"
 			class:active={activeTab === 'media'}
-			on:click={() => (activeTab = 'media')}
+			onclick={() => (activeTab = 'media')}
 		>
 			Press & Media
 		</button>
 		<button
 			class="tab-button"
 			class:active={activeTab === 'feedback'}
-			on:click={() => (activeTab = 'feedback')}
+			onclick={() => (activeTab = 'feedback')}
 		>
 			Feedback
 		</button>

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy'
+
 	import { page } from '$app/stores'
 	import Button from '$lib/components/Button.svelte'
 	import Link from '$lib/components/Link.svelte'
@@ -24,20 +26,24 @@
 	} from './selfieStore'
 
 	// Local element references
-	let videoElement: HTMLVideoElement | null = null
-	let canvasElement: HTMLCanvasElement | null = null
+	let videoElement: HTMLVideoElement | null = $state(null)
+	let canvasElement: HTMLCanvasElement | null = $state(null)
 
 	// Update store when elements are bound
-	$: setVideoElement(videoElement)
-	$: setCanvasElement(canvasElement)
+	run(() => {
+		setVideoElement(videoElement)
+	})
+	run(() => {
+		setCanvasElement(canvasElement)
+	})
 
-	$: emailValid = $userEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($userEmail)
+	let emailValid = $derived($userEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($userEmail))
 
 	// Check if x002 experiment parameter is present (control = hide sharing)
-	$: hideSharing = $page.url.searchParams.has('x002')
+	let hideSharing = $derived($page.url.searchParams.has('x002'))
 
 	// Local UI state
-	let showTips = false
+	let showTips = $state(false)
 </script>
 
 <!-- Compact capture UX above standard page header -->
@@ -82,7 +88,7 @@
 				</div>
 				<button
 					class="capture-button primary"
-					on:click={requestCameraPermission}
+					onclick={requestCameraPermission}
 					disabled={($cameraPermissionRequested && !$cameraAvailable) || $cameraPermissionDenied}
 				>
 					{#if $cameraPermissionRequested && !$cameraAvailable && !$cameraPermissionDenied}
@@ -98,7 +104,7 @@
 				<div class="camera-box">
 					<video
 						bind:this={videoElement}
-						on:loadedmetadata={() => {
+						onloadedmetadata={() => {
 							console.log('Video metadata loaded')
 							if (stream && videoElement && !videoElement.srcObject) {
 								videoElement.srcObject = stream
@@ -113,7 +119,7 @@
 					></video>
 					<canvas bind:this={canvasElement} style="display: none;"></canvas>
 				</div>
-				<button class="capture-button primary" on:click={captureFromCamera} disabled={$isCapturing}>
+				<button class="capture-button primary" onclick={captureFromCamera} disabled={$isCapturing}>
 					{#if $isCapturing}
 						Capturing...
 					{:else}
@@ -121,7 +127,7 @@
 					{/if}
 				</button>
 			{/if}
-			<button class="capture-button secondary" on:click={openUploadWidget}>
+			<button class="capture-button secondary" onclick={openUploadWidget}>
 				Use Existing Photo
 			</button>
 		</div>
@@ -139,7 +145,7 @@
 							type="email"
 							bind:value={$userEmail}
 							placeholder="your@email.com"
-							on:keypress={(e) => {
+							onkeypress={(e) => {
 								if (e.key === 'Enter' && emailValid) {
 									void finalizeSubmission()
 								}
@@ -185,7 +191,7 @@
 				<div class="tips-section">
 					<button
 						class="tips-toggle"
-						on:click={() => (showTips = !showTips)}
+						onclick={() => (showTips = !showTips)}
 						aria-expanded={showTips}
 					>
 						{showTips ? '▼' : '▶'} Tips for a better selfie

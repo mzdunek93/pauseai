@@ -8,7 +8,11 @@
 	import type { PageData } from './$types'
 	import type { Signatory } from './types'
 
-	export let data: PageData
+	interface Props {
+		data: PageData
+	}
+
+	let { data }: Props = $props()
 
 	const { signatories } = data
 
@@ -54,12 +58,12 @@
 	})
 
 	// Map organization names to their logo files (theme-aware with cache busting)
-	$: organizationLogos = {
+	let organizationLogos = $derived({
 		'Open Rights Group': `/open-letter/civil_society_logos/${$theme === 'dark' ? 'white' : 'black'}/open_rights_group.png?theme=${$theme}`,
 		'Connected by Data': `/open-letter/civil_society_logos/${$theme === 'dark' ? 'white' : 'black'}/connected_by_data.png?theme=${$theme}`,
 		'Open Data Manchester': `/open-letter/civil_society_logos/${$theme === 'dark' ? 'white' : 'black'}/open_data_manchester.png?theme=${$theme}`,
 		'Safe AI for Children Alliance': `/open-letter/civil_society_logos/${$theme === 'dark' ? 'white' : 'black'}/safe_ai_for_children_alliance.png?theme=${$theme}`
-	} as Record<string, string>
+	} as Record<string, string>)
 
 	function getOrganizationWebsite(name: string): string {
 		const websites = {

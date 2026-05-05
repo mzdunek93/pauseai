@@ -5,16 +5,16 @@
 	import { outcomesMeta } from './meta'
 	import PostMeta from '$lib/components/PostMeta.svelte'
 
-	let intro = true
-	let showProbabilities = false
-	let top: HTMLElement
+	let intro = $state(true)
+	let showProbabilities = $state(false)
+	let top: HTMLElement = $state()
 	let { title, description, date } = outcomesMeta
 </script>
 
 <PostMeta {title} {description} {date} />
 
 <div class="header">
-	<button class="reset-button" on:click={() => (intro = true)} bind:this={top}>
+	<button class="reset-button" onclick={() => (intro = true)} bind:this={top}>
 		<h1>{title}</h1>
 	</button>
 	{#if !intro}
